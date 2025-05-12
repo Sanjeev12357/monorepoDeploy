@@ -5,7 +5,7 @@
   "keywords": [],
   "author": "",
   "exports":{
-    "./client":"./src/index.ts"
+    "./client":"./dist/index.js"
   },
   "license": "ISC",
   "description": "",
