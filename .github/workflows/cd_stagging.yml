@@ -1,0 +1,27 @@
+name: Deploy to staging
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  redeploy_everything:
+    name: Deploying everything to the staging server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: 64.227.148.39
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd monorepoDeploy
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart next-server
+            pm2 restart http-server
+            pm2 restart ws-server
