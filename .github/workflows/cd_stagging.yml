@@ -11,17 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: 64.227.148.39
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+      - name: SSH and Deploy
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key
+          chmod 600 ssh_key
+          ssh -o StrictHostKeyChecking=no -i ssh_key root@64.227.148.39 << 'EOF'
+            export PNPM="/root/.nvm/versions/node/v22.15.0/bin/pnpm"
+            export PM2="/root/.nvm/versions/node/v22.15.0/bin/pm2"
+            
             cd monorepoDeploy
             git pull
-            pnpm install
-            pnpm run build
-            pm2 restart fe-server
-            pm2 restart http-server
-            pm2 restart ws-server
+            $PNPM install
+            $PNPM run build
+            $PM2 restart next-server
+            $PM2 restart http-server
+            $PM2 restart ws-server
+          EOF
+
